@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lista de Tarefas</title>
+  <style>
+    /* Reset simples */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      scroll-behavior: smooth;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      color: #fff;
+    }
+
+    .container {
+      background: #1f1f38;
+      padding: 30px 40px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Título */
+    h1 {
+      font-weight: 800;
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
+      color: #f3f3f3;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    /* Formulário */
+    form {
+      display: flex;
+      margin-bottom: 25px;
+      gap: 12px;
+    }
+
+    #input-tarefa {
+      flex-grow: 1;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1.1rem;
+      background: #2d2d55;
+      color: #fff;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    #input-tarefa::placeholder {
+      color: #aaa;
+    }
+
+    #input-tarefa:focus {
+      outline: none;
+      background: #40407f;
+      box-shadow: 0 0 8px #667eea;
+    }
+
+    #btn-adicionar {
+      background: #7f5af0;
+      border: none;
+      padding: 0 28px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 12px #7f5af0aa;
+      transition: all 0.3s ease;
+    }
+
+    #btn-adicionar:hover {
+      background: #6b45e0;
+      box-shadow: 0 10px 20px #6b45e0cc;
+      transform: translateY(-2px);
+    }
+
+    /* Filtros */
+    .filtros {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .filtros button {
+      background: #2d2d55;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 20px;
+      font-weight: 600;
+      color: #bbb;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      transition: all 0.25s ease;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .filtros button.ativo,
+    .filtros button:hover {
+      background: #7f5af0;
+      color: #fff;
+      box-shadow: 0 6px 18px #7f5af0cc;
+      transform: translateY(-3px);
+    }
+
+    /* Lista */
+    #lista-tarefas {
+      list-style: none;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 8px;
+      flex-grow: 1;
+    }
+
+    /* Scroll customizado */
+    #lista-tarefas::-webkit-scrollbar {
+      width: 8px;
+    }
+    #lista-tarefas::-webkit-scrollbar-track {
+      background: #1f1f38;
+      border-radius: 8px;
+    }
+    #lista-tarefas::-webkit-scrollbar-thumb {
+      background: #7f5af0;
+      border-radius: 8px;
+    }
+
+    /* Item da lista */
+    #lista-tarefas li {
+      background: #2d2d55;
+      padding: 16px 20px;
+      margin-bottom: 15px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 5px 15px rgba(127, 90, 240, 0.2);
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #lista-tarefas li:hover {
+      background: #3c3c7a;
+    }
+
+    /* Tarefa concluída */
+    #lista-tarefas li.concluida {
+      background: #3a3a52;
+      color: #999;
+      text-decoration: line-through;
+      box-shadow: 0 0 10px #44d17baa;
+      cursor: default;
+    }
+
+    /* Tarefa removida (lixeira) */
+    #lista-tarefas li.removida {
+      background: #3d2a4d;
+      color: #cda6f5;
+      font-style: italic;
+      box-shadow: 0 0 10px #b078e0aa;
+      cursor: default;
+    }
+
+    /* Texto da tarefa */
+    #lista-tarefas li span:first-child {
+      flex-grow: 1;
+      font-size: 1.15rem;
+      padding-right: 12px;
+      word-break: break-word;
+    }
+
+    /* Container dos botões */
+    .buttons-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Botões */
+    .buttons-container button {
+      border: none;
+      border-radius: 50%;
+      padding: 8px 10px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .buttons-container button.concluir {
+      background: #44d17b;
+      box-shadow: 0 4px 12px #44d17baa;
+    }
+
+    .buttons-container button.concluir:hover {
+      background: #32b35a;
+      transform: scale(1.15);
+    }
+
+    .buttons-container button.apagar {
+      background: #ff6b6b;
+      box-shadow: 0 4px 12px #ff6b6baa;
+    }
+
+    .buttons-container button.apagar:hover {
+      background: #e04e4e;
+      transform: scale(1.15);
+    }
+
+    .buttons-container button.restaurar {
+      background: #6c63ff;
+      box-shadow: 0 4px 12px #6c63ffaa;
+    }
+
+    .buttons-container button.restaurar:hover {
+      background: #5249d1;
+      transform: scale(1.15);
+    }
+
+    /* Botão esvaziar lixeira */
+    #btn-esvaziar {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-weight: 700;
+      background: #ff4d4d;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 5px 15px #ff4d4daa;
+      transition: background-color 0.3s ease;
+      align-self: center;
+    }
+    #btn-esvaziar:hover {
+      background: #d93535;
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      body {
+        padding: 15px 10px;
+      }
+      .container {
+        padding: 20px 20px;
+      }
+      #lista-tarefas li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .buttons-container {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lista de Tarefas</h1>
+
+    <form id="form-tarefa">
+      <input type="text" id="input-tarefa" placeholder="Digite uma nova tarefa..." autocomplete="off" />
+      <button id="btn-adicionar" type="submit">Adicionar</button>
+    </form>
+
+    <div class="filtros">
+      <button data-filtro="todas" class="ativo">Todas</button>
+      <button data-filtro="pendentes">Pendentes</button>
+      <button data-filtro="concluidas">Concluídas</button>
+  
+    </div>
+
+    <ul id="lista-tarefas"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
