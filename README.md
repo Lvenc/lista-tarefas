@@ -28,3 +28,14 @@ Projeto simples de lista de tarefas com funcionalidades de criar, concluir, move
 1. Clone o repositório:
 ```bash
 git clone https://github.com/Lvenc/lista-tarefas.git
+
+2. Entre na pasta do projeto:
+cd lista-tarefas
+
+3. Instale as dependências do backend:
+npm install
+
+4.Inicie o servidor backend:
+node index.js
+
+5. Abra o arquivo index.html no navegador (ou use Live Server) para acessar o frontend.
